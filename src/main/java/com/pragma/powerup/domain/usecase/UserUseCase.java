@@ -2,6 +2,7 @@ package com.pragma.powerup.domain.usecase;
 
 import com.pragma.powerup.domain.api.IUserServicePort;
 import com.pragma.powerup.domain.exception.InvalidDataException;
+import com.pragma.powerup.domain.exception.ResourceConflictException;
 import com.pragma.powerup.domain.model.RoleModel;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IEncryptionPersistencePort;
@@ -31,11 +32,11 @@ public class UserUseCase implements IUserServicePort {
      void saveUser(UserModel userModel, String roleName) {
         userValidator.validate(userModel);
         if (userPersistencePort.existsByDni(userModel.getDni())) {
-            throw new InvalidDataException(DNI_ALREADY_EXISTS);
+            throw new ResourceConflictException(DNI_ALREADY_EXISTS);
         }
 
         if (userPersistencePort.existsByEmail(userModel.getEmail())) {
-            throw new InvalidDataException(EMAIL_ALREADY_EXISTS);
+            throw new ResourceConflictException(EMAIL_ALREADY_EXISTS);
         }
         RoleModel role = rolePersistencePort.getRoleByName(roleName);
         userModel.setRole(role);

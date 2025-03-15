@@ -1,4 +1,4 @@
-package com.pragma.powerup.application.constants;
+package com.pragma.powerup.application.util.constants;
 
 public class UserRequestDtoConstants {
 

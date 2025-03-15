@@ -1,6 +1,7 @@
 package com.pragma.powerup.infrastructure.exceptionhandler;
 
 import com.pragma.powerup.domain.exception.InvalidDataException;
+import com.pragma.powerup.domain.exception.ResourceConflictException;
 import com.pragma.powerup.infrastructure.exception.CustomException;
 import com.pragma.powerup.infrastructure.exception.NoDataFoundException;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class ControllerAdvisor {
     }
 
     @ExceptionHandler(NoDataFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNoDataFoundException(NoDataFoundException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleNoDataFoundException( HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
                 ExceptionResponse.NO_DATA_FOUND.getMessage(),
@@ -45,7 +46,7 @@ public class ControllerAdvisor {
     }
 
     @ExceptionHandler(SecurityException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(SecurityException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException( HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.FORBIDDEN.value(),
                 ExceptionResponse.ACCESS_DENIED.getMessage(),
@@ -56,7 +57,7 @@ public class ControllerAdvisor {
 
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleGeneralException( HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 ExceptionResponse.INTERNAL_SERVER_ERROR.getMessage(),
@@ -74,6 +75,17 @@ public class ControllerAdvisor {
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
+    @ExceptionHandler(ResourceConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflictException(ResourceConflictException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
 
 
 
