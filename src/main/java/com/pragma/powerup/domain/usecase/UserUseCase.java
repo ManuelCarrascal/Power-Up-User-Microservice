@@ -1,7 +1,6 @@
 package com.pragma.powerup.domain.usecase;
 
 import com.pragma.powerup.domain.api.IUserServicePort;
-import com.pragma.powerup.domain.exception.InvalidDataException;
 import com.pragma.powerup.domain.exception.ResourceConflictException;
 import com.pragma.powerup.domain.model.RoleModel;
 import com.pragma.powerup.domain.model.UserModel;

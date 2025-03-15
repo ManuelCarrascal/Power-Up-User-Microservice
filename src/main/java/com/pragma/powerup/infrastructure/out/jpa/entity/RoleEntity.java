@@ -22,4 +22,9 @@ public class RoleEntity {
     private String name;
     @OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
     private List<UserEntity> users;
+
+    public RoleEntity(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

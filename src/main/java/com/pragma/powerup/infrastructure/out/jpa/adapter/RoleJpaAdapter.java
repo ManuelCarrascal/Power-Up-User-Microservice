@@ -14,7 +14,6 @@ public class RoleJpaAdapter implements IRolePersistencePort {
         this.roleEntityMapper = roleEntityMapper;
     }
 
-
     @Override
     public RoleModel getRoleByName(String name) {
         return roleEntityMapper.toDomain(roleRepository.findByName(name));
