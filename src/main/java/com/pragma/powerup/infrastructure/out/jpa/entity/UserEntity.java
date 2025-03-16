@@ -1,12 +1,12 @@
 package com.pragma.powerup.infrastructure.out.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.pragma.powerup.infrastructure.out.jpa.constants.UserEntityConstants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.management.relation.Role;
 import javax.persistence.*;
 import java.time.LocalDate;
 
@@ -62,6 +62,7 @@ public class UserEntity {
     )
     private String password;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     private RoleEntity role;
 }
