@@ -1,6 +1,7 @@
 package com.pragma.powerup.infrastructure.out.jpa.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,11 +21,7 @@ public class RoleEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<UserEntity> users;
-
-    public RoleEntity(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 }
