@@ -12,7 +12,7 @@ public class UserJpaAdapter implements IUserPersistencePort {
     private final IUserEntityMapper userEntityMapper;
 
 
-    public UserJpaAdapter(IUserRepository userRepository, IUserEntityMapper userEntityMapper) {
+    public UserJpaAdapter(IUserRepository userRepository, IUserEntityMapper userEntityMapper ) {
         this.userRepository = userRepository;
         this.userEntityMapper = userEntityMapper;
     }
@@ -32,4 +32,14 @@ public class UserJpaAdapter implements IUserPersistencePort {
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
+
+    @Override
+    public UserModel findUser(Long ownerId) {
+        return userRepository.findById(ownerId)
+                .map(userEntityMapper::toModel)
+                .orElse(null);
+    }
+
+
+
 }

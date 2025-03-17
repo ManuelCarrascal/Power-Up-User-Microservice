@@ -24,4 +24,9 @@ public class UserHandler implements IUserHandler {
 
     }
 
+    @Override
+    public Boolean isOwner(Long ownerId) {
+        return userServicePort.isOwner(ownerId);
+    }
+
 }

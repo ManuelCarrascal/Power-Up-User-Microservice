@@ -98,4 +98,48 @@ class UserJpaAdapterTest {
 
         assertFalse(result);
     }
+
+    @Test
+    void testFindUser_WhenUserExists_ReturnsUserModel() {
+        IUserRepository userRepository = Mockito.mock(IUserRepository.class);
+        IUserEntityMapper userEntityMapper = Mockito.mock(IUserEntityMapper.class);
+        UserJpaAdapter userJpaAdapter = new UserJpaAdapter(userRepository, userEntityMapper);
+
+        Long userId = 1L;
+        UserEntity userEntity = new UserEntity();
+        UserModel userModel = new UserModel.Builder()
+                .id(userId)
+                .name("Test")
+                .lastName("User")
+                .dni("12345678")
+                .phone("1234567890")
+                .dateOfBirth(LocalDate.of(1990, 1, 1))
+                .email("test.user@example.com")
+                .password("password")
+                .build();
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(userEntity));
+        Mockito.when(userEntityMapper.toModel(userEntity)).thenReturn(userModel);
+
+        UserModel result = userJpaAdapter.findUser(userId);
+
+        Mockito.verify(userRepository).findById(userId);
+        Mockito.verify(userEntityMapper).toModel(userEntity);
+        assertTrue(result != null && result.getId().equals(userId));
+    }
+
+    @Test
+    void testFindUser_WhenUserDoesNotExist_ReturnsNull() {
+        IUserRepository userRepository = Mockito.mock(IUserRepository.class);
+        IUserEntityMapper userEntityMapper = Mockito.mock(IUserEntityMapper.class);
+        UserJpaAdapter userJpaAdapter = new UserJpaAdapter(userRepository, userEntityMapper);
+
+        Long userId = 1L;
+        Mockito.when(userRepository.findById(userId)).thenReturn(java.util.Optional.empty());
+
+        UserModel result = userJpaAdapter.findUser(userId);
+
+        Mockito.verify(userRepository).findById(userId);
+        assertTrue(result == null);
+    }
 }

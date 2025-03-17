@@ -1,6 +1,7 @@
 package com.pragma.powerup.domain.usecase;
 
 import com.pragma.powerup.domain.exception.ResourceConflictException;
+import com.pragma.powerup.domain.exception.ResourceNotFoundException;
 import com.pragma.powerup.domain.model.RoleModel;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IEncryptionPersistencePort;
@@ -10,10 +11,67 @@ import com.pragma.powerup.domain.utils.constants.UserUseCaseConstants;
 import com.pragma.powerup.domain.utils.validators.UserValidator;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class UserUseCaseTest {
+    @Test
+    void isOwner_ShouldReturnTrue_WhenUserIsOwner() {
+        IUserPersistencePort userPersistencePort = mock(IUserPersistencePort.class);
+        IRolePersistencePort rolePersistencePort = mock(IRolePersistencePort.class);
+        IEncryptionPersistencePort encryptionPersistencePort = mock(IEncryptionPersistencePort.class);
+        UserValidator userValidator = mock(UserValidator.class);
+        UserUseCase userUseCase = new UserUseCase(userPersistencePort, encryptionPersistencePort, rolePersistencePort, userValidator);
+
+        RoleModel ownerRole = new RoleModel();
+        ownerRole.setName(UserUseCaseConstants.USER_OWNER);
+        UserModel userModel = new UserModel();
+        userModel.setRole(ownerRole);
+
+        when(userPersistencePort.findUser(1L)).thenReturn(userModel);
+
+        Boolean result = userUseCase.isOwner(1L);
+
+        assertEquals(true, result);
+        verify(userPersistencePort, times(1)).findUser(1L);
+    }
+
+    @Test
+    void isOwner_ShouldReturnFalse_WhenUserIsNotOwner() {
+        IUserPersistencePort userPersistencePort = mock(IUserPersistencePort.class);
+        IRolePersistencePort rolePersistencePort = mock(IRolePersistencePort.class);
+        IEncryptionPersistencePort encryptionPersistencePort = mock(IEncryptionPersistencePort.class);
+        UserValidator userValidator = mock(UserValidator.class);
+        UserUseCase userUseCase = new UserUseCase(userPersistencePort, encryptionPersistencePort, rolePersistencePort, userValidator);
+
+        RoleModel userRole = new RoleModel();
+        userRole.setName("OTHER_ROLE");
+        UserModel userModel = new UserModel();
+        userModel.setRole(userRole);
+
+        when(userPersistencePort.findUser(2L)).thenReturn(userModel);
+
+        Boolean result = userUseCase.isOwner(2L);
+
+        assertEquals(false, result);
+        verify(userPersistencePort, times(1)).findUser(2L);
+    }
+
+    @Test
+    void isOwner_ShouldThrowResourceNotFoundException_WhenUserDoesNotExist() {
+        IUserPersistencePort userPersistencePort = mock(IUserPersistencePort.class);
+        IRolePersistencePort rolePersistencePort = mock(IRolePersistencePort.class);
+        IEncryptionPersistencePort encryptionPersistencePort = mock(IEncryptionPersistencePort.class);
+        UserValidator userValidator = mock(UserValidator.class);
+        UserUseCase userUseCase = new UserUseCase(userPersistencePort, encryptionPersistencePort, rolePersistencePort, userValidator);
+
+        when(userPersistencePort.findUser(3L)).thenReturn(null);
+
+        assertThrows(ResourceNotFoundException.class, () -> userUseCase.isOwner(3L));
+        verify(userPersistencePort, times(1)).findUser(3L);
+    }
+
     @Test
     void saveOwner_ShouldSaveOwnerSuccessfully_WhenDataIsValid() {
         IUserPersistencePort userPersistencePort = mock(IUserPersistencePort.class);
