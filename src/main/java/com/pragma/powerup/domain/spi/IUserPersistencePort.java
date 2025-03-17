@@ -6,4 +6,5 @@ public interface IUserPersistencePort {
  void saveOwner(UserModel userModel);
  boolean existsByDni(String dni);
  boolean existsByEmail(String email);
+ UserModel findUser(Long ownerId);
 }

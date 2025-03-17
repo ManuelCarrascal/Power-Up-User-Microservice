@@ -2,6 +2,7 @@ package com.pragma.powerup.domain.usecase;
 
 import com.pragma.powerup.domain.api.IUserServicePort;
 import com.pragma.powerup.domain.exception.ResourceConflictException;
+import com.pragma.powerup.domain.exception.ResourceNotFoundException;
 import com.pragma.powerup.domain.model.RoleModel;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IEncryptionPersistencePort;
@@ -48,6 +49,15 @@ public class UserUseCase implements IUserServicePort {
         saveUser(userModel, UserUseCaseConstants.USER_OWNER);
         userPersistencePort.saveOwner(userModel);
 
+    }
+
+    @Override
+    public Boolean isOwner(Long ownerId) {
+        UserModel user = userPersistencePort.findUser(ownerId);
+        if(user == null){
+            throw new ResourceNotFoundException(UserUseCaseConstants.USER_NOT_FOUND_MESSAGE);
+        }
+        return user.getRole().getName().equals(UserUseCaseConstants.USER_OWNER);
     }
 
 }

@@ -4,4 +4,5 @@ import com.pragma.powerup.domain.model.UserModel;
 
 public interface IUserServicePort {
     void saveOwner(UserModel userModel);
+    Boolean isOwner(Long ownerId);
 }
