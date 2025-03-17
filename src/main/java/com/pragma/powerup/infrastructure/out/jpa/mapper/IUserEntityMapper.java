@@ -13,4 +13,5 @@ import org.mapstruct.ReportingPolicy;
 public interface IUserEntityMapper {
     @Mapping(target = "id", ignore = true)
     UserEntity toEntity(UserModel user);
+    UserModel toModel(UserEntity userEntity);
 }

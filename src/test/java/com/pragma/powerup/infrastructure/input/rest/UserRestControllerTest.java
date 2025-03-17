@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pragma.powerup.application.dto.request.UserRequestDto;
 import com.pragma.powerup.application.handler.IUserHandler;
+import com.pragma.powerup.domain.exception.ResourceNotFoundException;
 import com.pragma.powerup.infrastructure.exceptionhandler.ControllerAdvisor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 
 import static org.mockito.Mockito.*;
@@ -68,5 +68,40 @@ class UserRestControllerTest {
                 .andExpect(status().isBadRequest());
 
         verifyNoInteractions(userHandler);
+    }
+
+    @Test
+    void findOwnerById_ValidRequest_ShouldReturnOk() throws Exception {
+        Long ownerId = 1L;
+        when(userHandler.isOwner(ownerId)).thenReturn(true);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/user/isOwner")
+                        .param("ownerId", ownerId.toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(userHandler, times(1)).isOwner(ownerId);
+    }
+
+    @Test
+    void findOwnerById_InvalidRequest_ShouldReturnBadRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/user/isOwner")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(userHandler);
+    }
+
+    @Test
+    void findOwnerById_NonExistingOwner_ShouldReturnNotFound() throws Exception {
+        Long nonExistingOwnerId = 999L;
+        when(userHandler.isOwner(nonExistingOwnerId)).thenThrow(new ResourceNotFoundException("User not found"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/user/isOwner")
+                        .param("ownerId", nonExistingOwnerId.toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        verify(userHandler, times(1)).isOwner(nonExistingOwnerId);
     }
 }

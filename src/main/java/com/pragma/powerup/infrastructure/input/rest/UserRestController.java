@@ -34,4 +34,9 @@ public class UserRestController {
         userHandler.saveOwner(userRequestDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    @GetMapping("/isOwner")
+    public ResponseEntity<Boolean> findOwnerById(@RequestParam Long ownerId) {
+        return ResponseEntity.ok(userHandler.isOwner(ownerId));
+    }
 }
