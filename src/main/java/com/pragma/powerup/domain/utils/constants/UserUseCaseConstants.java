@@ -6,5 +6,5 @@ public class UserUseCaseConstants {
     private UserUseCaseConstants() {
     }
 
-    public static final String USER_OWNER = "owner";
+    public static final String USER_OWNER = "OWNER";
 }

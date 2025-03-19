@@ -156,4 +156,13 @@ public class UserModel {
 
     public UserModel() {
     }
+
+    public UserModel(Long id, String email, String password, RoleModel role) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+
 }
