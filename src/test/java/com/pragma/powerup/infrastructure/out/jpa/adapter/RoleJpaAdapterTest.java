@@ -14,8 +14,8 @@ class RoleJpaAdapterTest {
 
     @Test
     void getRoleByName_shouldReturnRoleModel_whenRoleExists() {
-        String roleName = "owner";
-        RoleEntity mockRoleEntity = new RoleEntity(1L, roleName);
+        String roleName = "OWNER";
+        RoleEntity mockRoleEntity = new RoleEntity(1L, roleName, null);
         RoleModel expectedRoleModel = new RoleModel(1L, roleName);
 
         IRoleRepository roleRepository = mock(IRoleRepository.class);

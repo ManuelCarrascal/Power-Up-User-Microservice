@@ -3,6 +3,7 @@ package com.pragma.powerup.infrastructure.input.rest;
 import com.pragma.powerup.application.dto.request.UserRequestDto;
 import com.pragma.powerup.application.handler.IUserHandler;
 import com.pragma.powerup.application.util.constants.openapi.ResponseCodes;
+import com.pragma.powerup.infrastructure.util.constants.UserRestControllerConstants;
 import com.pragma.powerup.infrastructure.util.constants.openapi.OpenApiUserRestControllerConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,6 +25,7 @@ public class UserRestController {
     private final IUserHandler userHandler;
 
     @PostMapping
+    @PreAuthorize(UserRestControllerConstants.PREAUTHORIZE_ROLE_ADMIN)
     @Operation(
             summary = OpenApiUserRestControllerConstants.OPERATION_SUMMARY,
             description = OpenApiUserRestControllerConstants.OPERATION_DESCRIPTION

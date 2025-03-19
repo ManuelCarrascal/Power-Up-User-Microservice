@@ -1,6 +1,7 @@
 package com.pragma.powerup.infrastructure.exceptionhandler;
 
 
+import com.pragma.powerup.domain.exception.AuthenticationException;
 import com.pragma.powerup.domain.exception.InvalidDataException;
 import com.pragma.powerup.domain.exception.ResourceConflictException;
 import com.pragma.powerup.domain.exception.ResourceNotFoundException;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -77,6 +79,13 @@ public class ControllerAdvisor {
                 ControllerAdvisorConstants.REQUIRED_PARAMETER_MISSING + ex.getParameterName(),
                 request
         );
+    }
+
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public String handleAuthenticationException(AuthenticationException ex) {
+        return ex.getMessage();
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request) {
