@@ -2,6 +2,7 @@ package com.pragma.powerup.infrastructure.security.service;
 
 import com.pragma.powerup.infrastructure.out.jpa.entity.RoleEntity;
 import com.pragma.powerup.infrastructure.out.jpa.entity.UserEntity;
+import com.pragma.powerup.infrastructure.util.constants.UserDetailImplConstants;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +21,8 @@ public class UserDetailImpl implements UserDetails {
     public UserDetailImpl(UserEntity userEntity, List<RoleEntity> roles){
         this.email = userEntity.getEmail();
         this.password = userEntity.getPassword();
-        this.authorities = roles.stream().map(role->new SimpleGrantedAuthority("ROLE_"+role.getName())).collect(Collectors.toList());
+        this.authorities = roles.stream().map(role->new SimpleGrantedAuthority(UserDetailImplConstants.ROLE_PREFIX
+                +role.getName())).collect(Collectors.toList());
     }
 
     @Override

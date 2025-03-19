@@ -6,6 +6,7 @@ import com.pragma.powerup.domain.api.IAuthServicePort;
 import com.pragma.powerup.domain.exception.AuthenticationException;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IAuthPersistencePort;
+import com.pragma.powerup.domain.utils.constants.AuthUseCaseConstants;
 
 public class AuthUseCase implements IAuthServicePort {
 
@@ -18,7 +19,7 @@ public class AuthUseCase implements IAuthServicePort {
     @Override
     public AuthResponseDto login(AuthRequestDto authRequestDto){
         if (!authPersistencePort.validateCredentials(authRequestDto.getEmail(), authRequestDto.getPassword())) {
-            throw new AuthenticationException("Invalid credentials");
+            throw new AuthenticationException(AuthUseCaseConstants.INVALID_CREDENTIALS_MESSAGE);
         }
         UserModel userModel = authPersistencePort.authenticate(authRequestDto.getEmail(), authRequestDto.getPassword());
         String token = authPersistencePort.generateToken(userModel);

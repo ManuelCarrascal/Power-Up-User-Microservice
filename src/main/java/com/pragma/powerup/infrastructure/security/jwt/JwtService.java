@@ -1,6 +1,7 @@
 package com.pragma.powerup.infrastructure.security.jwt;
 
 import com.pragma.powerup.domain.model.UserModel;
+import com.pragma.powerup.infrastructure.util.constants.JwtServiceConstants;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -13,13 +14,13 @@ import java.util.Map;
 @Service
 public class JwtService {
 
-    private String secretKey="bXFqaWxwdWV2aWdoc29wYmNkYXNxd2ZnbmtqcnNmc2RramY=";
+    private static final String SECRET_KEY= JwtServiceConstants.SECRET_KEY;
 
 
     public String generateToken(UserModel user, Map<String, Object> extraClaims) {
 
         Date issuedAt = new Date(System.currentTimeMillis());
-        Date expiration = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10);
+        Date expiration = new Date(System.currentTimeMillis() + JwtServiceConstants.TOKEN_EXPIRATION_TIME);
         return Jwts.builder().setClaims(extraClaims)
                 .setSubject(user.getEmail())
                 .setIssuedAt(issuedAt)
@@ -30,7 +31,7 @@ public class JwtService {
     }
 
     private Key generateKey(){
-        byte[] secretAsBytes = Decoders.BASE64.decode(secretKey);
+        byte[] secretAsBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(secretAsBytes);
     }
 

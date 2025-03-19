@@ -33,26 +33,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authorizationHeader = request.getHeader("Authorization");
-        if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")){
+        String authorizationHeader = request.getHeader(JwtAuthenticationFilterConstants.HEADER_STRING);
+        if(authorizationHeader == null || !authorizationHeader.startsWith(JwtAuthenticationFilterConstants.AUTH_HEADER_PREFIX)){
             filterChain.doFilter(request, response);
             return;
         }
 
         if (!authorizationHeader.contains(JwtAuthenticationFilterConstants.SPLITERSTRING) ||
-                authorizationHeader.split(JwtAuthenticationFilterConstants.SPLITERSTRING).length < 2) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Token is empty");
+                authorizationHeader.split(JwtAuthenticationFilterConstants.SPLITERSTRING).length < JwtAuthenticationFilterConstants.TOKEN_INDEX_PARTS_MIN) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, JwtAuthenticationFilterConstants.ERROR_TOKEN_EMPTY);
             return;
         }
 
-        String jwt = authorizationHeader.split(JwtAuthenticationFilterConstants.SPLITERSTRING)[1];
+        String jwt = authorizationHeader.split(JwtAuthenticationFilterConstants.SPLITERSTRING)[JwtAuthenticationFilterConstants.TOKEN_INDEX_EXTRACTED];
 
         try{
             String username = jwtService.extractUsername(jwt);
             if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
                 UserDetails userDetails = userRepository.findByEmail(username)
                         .map(user -> new UserDetailImpl(user, roleRepository.findRolesByUserId(user.getId())))
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                        .orElseThrow(() -> new UsernameNotFoundException(JwtAuthenticationFilterConstants.ERROR_USER_NOT_FOUND));
 
                 if (jwtService.isTokenValid(jwt)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -61,21 +61,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
-                System.out.println("Authorities: " + userDetails.getAuthorities());
-
             }
 
         }
         catch (ExpiredJwtException e){
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is expired");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, JwtAuthenticationFilterConstants.ERROR_TOKEN_EXPIRED);
             return;
         }
         catch (UnsupportedJwtException e){
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is unsupported");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, JwtAuthenticationFilterConstants.ERROR_TOKEN_UNSUPPORTED);
             return;
         }
         catch (MalformedJwtException e){
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is malformed");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, JwtAuthenticationFilterConstants.ERROR_TOKEN_MALFORMED);
             return;
         }
         filterChain.doFilter(request, response);

@@ -3,6 +3,7 @@ package com.pragma.powerup.infrastructure.input.rest;
 import com.pragma.powerup.application.dto.request.UserRequestDto;
 import com.pragma.powerup.application.handler.IUserHandler;
 import com.pragma.powerup.application.util.constants.openapi.ResponseCodes;
+import com.pragma.powerup.infrastructure.util.constants.UserRestControllerConstants;
 import com.pragma.powerup.infrastructure.util.constants.openapi.OpenApiUserRestControllerConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,7 +25,7 @@ public class UserRestController {
     private final IUserHandler userHandler;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize(UserRestControllerConstants.PREAUTHORIZE_ROLE_ADMIN)
     @Operation(
             summary = OpenApiUserRestControllerConstants.OPERATION_SUMMARY,
             description = OpenApiUserRestControllerConstants.OPERATION_DESCRIPTION
