@@ -1,6 +1,5 @@
 package com.pragma.powerup.application.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pragma.powerup.application.util.constants.UserRequestDtoConstants;
 import com.pragma.powerup.application.util.constants.openapi.OpenApiUserRequestConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,12 +7,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.*;
-import java.time.LocalDate;
 
 @Getter
 @Setter
-@Schema(description = OpenApiUserRequestConstants.USER_REQUEST_DESCRIPTION)
-public class UserRequestDto {
+@Schema(description = "")
+public class EmployeeRequestDto {
+
     @NotBlank(message = UserRequestDtoConstants.NAME_REQUIRED_MESSAGE)
     @Schema(
             description = OpenApiUserRequestConstants.NAME_DESCRIPTION,
@@ -43,14 +42,6 @@ public class UserRequestDto {
             example = OpenApiUserRequestConstants.PHONE_EXAMPLE
     )
     private String phone;
-
-    @Past(message = UserRequestDtoConstants.DATE_OF_BIRTH_PAST_MESSAGE)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = UserRequestDtoConstants.DATE_FORMAT)
-    @Schema(
-            description = OpenApiUserRequestConstants.DATE_OF_BIRTH_DESCRIPTION,
-            example = OpenApiUserRequestConstants.DATE_OF_BIRTH_EXAMPLE
-    )
-    private LocalDate dateOfBirth;
 
     @NotBlank(message = UserRequestDtoConstants.EMAIL_REQUIRED_MESSAGE)
     @Email(message = UserRequestDtoConstants.EMAIL_INVALID_MESSAGE)

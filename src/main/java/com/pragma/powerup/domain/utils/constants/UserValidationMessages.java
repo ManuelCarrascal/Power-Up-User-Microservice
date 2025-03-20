@@ -9,7 +9,7 @@ public class UserValidationMessages {
     public static final String DNI_ALREADY_EXISTS = "DNI already exists";
     public static final String PHONE_REQUIRED = "phone is mandatory";
     public static final String PHONE_FORMAT_INVALID = "phone is invalid";
-    public static final String DATE_OF_BIRTH_REQUIRED = "date of birth is mandatory";
+    public static final String DATE_OF_BIRTH_REQUIRED = "date of birth is mandatory validator";
     public static final String DATE_OF_BIRTH_FORMAT_INVALID = "invalid date format. It should be yyyy-MM-dd";
     public static final String MESSAGE_MINOR_AGE_RESTRICTION= "the user must be of legal age";
     public static final String PHONE_LENGTH_INVALID = "phone number cannot exceed 13 characters";
