@@ -13,16 +13,22 @@ import java.util.stream.Collectors;
 
 public class UserDetailImpl implements UserDetails {
 
+    private Long id;
     private String email;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
 
     public UserDetailImpl(UserEntity userEntity, List<RoleEntity> roles){
+        this.id = userEntity.getId();
         this.email = userEntity.getEmail();
         this.password = userEntity.getPassword();
         this.authorities = roles.stream().map(role->new SimpleGrantedAuthority(UserDetailImplConstants.ROLE_PREFIX
                 +role.getName())).collect(Collectors.toList());
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.pragma.powerup.infrastructure.out.jpa.adapter;
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
 import com.pragma.powerup.infrastructure.exception.CustomException;
-import com.pragma.powerup.infrastructure.feign.IRestaurantFeignClient;
 import com.pragma.powerup.infrastructure.out.jpa.entity.UserEntity;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IUserEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IUserRepository;
@@ -15,7 +14,6 @@ public class UserJpaAdapter implements IUserPersistencePort {
 
     private final IUserRepository userRepository;
     private final IUserEntityMapper userEntityMapper;
-    private final IRestaurantFeignClient restaurantFeignClient;
 
     @Override
     public void saveOwner(UserModel userModel) {
@@ -26,8 +24,8 @@ public class UserJpaAdapter implements IUserPersistencePort {
     @Override
     public void saveEmployee(UserModel userModel, Long restaurantId) {
         UserEntity userEntity = userEntityMapper.toEntity(userModel);
-        UserEntity savedEntity = userRepository.save(userEntity);
-        restaurantFeignClient.createEmployee(savedEntity.getId(), restaurantId);
+        UserEntity savedUserEntity = userRepository.save(userEntity);
+        userModel.setId(savedUserEntity.getId());
     }
 
     @Override
