@@ -6,4 +6,5 @@ public interface IAuthPersistencePort {
     UserModel authenticate(String email, String password);
     String generateToken(UserModel userModel);
     boolean validateCredentials(String email, String password);
+    Long getAuthenticatedUserId();
 }

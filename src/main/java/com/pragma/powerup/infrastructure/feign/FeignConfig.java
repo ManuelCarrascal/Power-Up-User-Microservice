@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FeignConfig {
 
-
     @Bean
     public Client feignClient() {
         return new ApacheHttpClient();
@@ -19,6 +18,5 @@ public class FeignConfig {
     public Logger .Level feignLoggerLevel() {
         return Logger.Level.FULL;
     }
-
 
 }

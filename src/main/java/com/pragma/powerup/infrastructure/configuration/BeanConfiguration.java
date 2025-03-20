@@ -9,10 +9,7 @@ import com.pragma.powerup.domain.usecase.RoleUseCase;
 import com.pragma.powerup.domain.usecase.UserUseCase;
 import com.pragma.powerup.domain.utils.validators.UserValidator;
 import com.pragma.powerup.infrastructure.feign.IRestaurantFeignClient;
-import com.pragma.powerup.infrastructure.out.jpa.adapter.AuthAdapter;
-import com.pragma.powerup.infrastructure.out.jpa.adapter.PasswordEncoderAdapter;
-import com.pragma.powerup.infrastructure.out.jpa.adapter.RoleJpaAdapter;
-import com.pragma.powerup.infrastructure.out.jpa.adapter.UserJpaAdapter;
+import com.pragma.powerup.infrastructure.out.jpa.adapter.*;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IRoleEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IUserEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IRoleRepository;
@@ -39,7 +36,7 @@ public class BeanConfiguration {
 
     @Bean
     public IUserPersistencePort userPersistencePort() {
-        return new UserJpaAdapter(userRepository, userEntityMapper, restaurantFeignClient);
+        return new UserJpaAdapter(userRepository, userEntityMapper);
     }
 
     @Bean
@@ -63,11 +60,18 @@ public class BeanConfiguration {
     }
 
     @Bean
+    public IRestaurantPersistencePort restaurantPersistencePort() {
+        return new RestaurantJpaAdapter(restaurantFeignClient);
+    }
+
+    @Bean
     public IUserServicePort userServicePort() {
         return new UserUseCase(
                 userPersistencePort(),
                 encryptionPersistencePort(),
                 rolePersistencePort(),
+                restaurantPersistencePort(),
+                authPersistencePort(),
                 userValidator()
         );
     }
