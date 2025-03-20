@@ -6,9 +6,12 @@ import com.pragma.powerup.domain.spi.IAuthPersistencePort;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IRoleEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IUserRepository;
 import com.pragma.powerup.infrastructure.security.jwt.JwtService;
+import com.pragma.powerup.infrastructure.security.service.UserDetailImpl;
 import com.pragma.powerup.infrastructure.util.constants.AuthAdapterConstants;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -45,7 +48,6 @@ public class AuthAdapter implements IAuthPersistencePort {
                 .orElseThrow(() -> new UsernameNotFoundException(AuthAdapterConstants.USER_NOT_FOUND_MESSAGE));
     }
 
-
     @Override
     public String generateToken(UserModel userModel) {
         return jwtService.generateToken(userModel, Map.of(
@@ -53,12 +55,23 @@ public class AuthAdapter implements IAuthPersistencePort {
         ));
     }
 
-
     @Override
     public boolean validateCredentials(String email, String password) {
         return userRepository.findByEmail(email)
                 .map(user -> passwordEncoder.matches(password, user.getPassword()))
                 .orElse(false);
+    }
+
+    @Override
+    public Long getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetailImpl)) {
+            throw new IllegalStateException("No authenticated user found.");
+        }
+
+        UserDetailImpl userDetails = (UserDetailImpl) authentication.getPrincipal();
+        return userDetails.getId();
     }
 
 }

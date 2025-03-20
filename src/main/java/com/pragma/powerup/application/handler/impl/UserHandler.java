@@ -18,11 +18,9 @@ public class UserHandler implements IUserHandler {
     private final IUserServicePort userServicePort;
     private final IUserRequestMapper userRequestMapper;
 
-
     public void saveOwner(UserRequestDto userRequestDto) {
         UserModel userModel = userRequestMapper.toUser(userRequestDto);
         userServicePort.saveOwner(userModel);
-
     }
 
     @Override

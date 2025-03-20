@@ -3,11 +3,10 @@ package com.pragma.powerup.domain.usecase;
 import com.pragma.powerup.domain.api.IUserServicePort;
 import com.pragma.powerup.domain.exception.ResourceConflictException;
 import com.pragma.powerup.domain.exception.ResourceNotFoundException;
+import com.pragma.powerup.domain.exception.UnauthorizedActionException;
 import com.pragma.powerup.domain.model.RoleModel;
 import com.pragma.powerup.domain.model.UserModel;
-import com.pragma.powerup.domain.spi.IEncryptionPersistencePort;
-import com.pragma.powerup.domain.spi.IRolePersistencePort;
-import com.pragma.powerup.domain.spi.IUserPersistencePort;
+import com.pragma.powerup.domain.spi.*;
 import com.pragma.powerup.domain.utils.constants.UserUseCaseConstants;
 import com.pragma.powerup.domain.utils.validators.UserValidator;
 
@@ -18,12 +17,16 @@ public class UserUseCase implements IUserServicePort {
     private final IUserPersistencePort userPersistencePort;
     private final IEncryptionPersistencePort encryptionPersistencePort;
     private final IRolePersistencePort rolePersistencePort;
+    private final IRestaurantPersistencePort restaurantPersistencePort;
+    private final IAuthPersistencePort authPersistencePort;
     private final UserValidator userValidator;
 
-    public UserUseCase(IUserPersistencePort userPersistencePort, IEncryptionPersistencePort encryptionServicePort, IRolePersistencePort rolePersistencePort, UserValidator userValidator) {
+    public UserUseCase(IUserPersistencePort userPersistencePort, IEncryptionPersistencePort encryptionServicePort, IRolePersistencePort rolePersistencePort, IRestaurantPersistencePort restaurantPersistencePort, IAuthPersistencePort authPersistencePort, UserValidator userValidator) {
         this.userPersistencePort = userPersistencePort;
         this.encryptionPersistencePort = encryptionServicePort;
         this.rolePersistencePort = rolePersistencePort;
+        this.restaurantPersistencePort = restaurantPersistencePort;
+        this.authPersistencePort = authPersistencePort;
         this.userValidator = userValidator;
     }
 
@@ -32,7 +35,6 @@ public class UserUseCase implements IUserServicePort {
         if (userPersistencePort.existsByDni(userModel.getDni())) {
             throw new ResourceConflictException(DNI_ALREADY_EXISTS);
         }
-
         if (userPersistencePort.existsByEmail(userModel.getEmail())) {
             throw new ResourceConflictException(EMAIL_ALREADY_EXISTS);
         }
@@ -49,8 +51,14 @@ public class UserUseCase implements IUserServicePort {
 
     @Override
     public void saveEmployee(UserModel userModel, Long restaurantId) {
+        Long ownerId=authPersistencePort.getAuthenticatedUserId();
+        boolean isOwnerOfRestaurant = restaurantPersistencePort.isOwnerOfRestaurant(ownerId, restaurantId);
+        if (!isOwnerOfRestaurant) {
+            throw new UnauthorizedActionException(UserUseCaseConstants.UNAUTHORIZED_ACTION_MESSAGE);
+        }
         saveUser(userModel, UserUseCaseConstants.USER_EMPLOYEE, false);
         userPersistencePort.saveEmployee(userModel, restaurantId);
+        restaurantPersistencePort.createEmployee(userModel.getId(), restaurantId);
     }
 
     @Override
