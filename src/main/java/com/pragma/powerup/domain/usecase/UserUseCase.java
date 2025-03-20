@@ -18,9 +18,7 @@ public class UserUseCase implements IUserServicePort {
     private final IUserPersistencePort userPersistencePort;
     private final IEncryptionPersistencePort encryptionPersistencePort;
     private final IRolePersistencePort rolePersistencePort;
-
     private final UserValidator userValidator;
-
 
     public UserUseCase(IUserPersistencePort userPersistencePort, IEncryptionPersistencePort encryptionServicePort, IRolePersistencePort rolePersistencePort, UserValidator userValidator) {
         this.userPersistencePort = userPersistencePort;
@@ -29,8 +27,8 @@ public class UserUseCase implements IUserServicePort {
         this.userValidator = userValidator;
     }
 
-     void saveUser(UserModel userModel, String roleName) {
-        userValidator.validate(userModel);
+    void saveUser(UserModel userModel, String roleName, boolean validateDateOfBirth) {
+        userValidator.validate(userModel, validateDateOfBirth);
         if (userPersistencePort.existsByDni(userModel.getDni())) {
             throw new ResourceConflictException(DNI_ALREADY_EXISTS);
         }
@@ -44,20 +42,23 @@ public class UserUseCase implements IUserServicePort {
         userModel.setPassword(encodedPassword);
     }
 
-
     public void saveOwner(UserModel userModel) {
-        saveUser(userModel, UserUseCaseConstants.USER_OWNER);
+        saveUser(userModel, UserUseCaseConstants.USER_OWNER, true);
         userPersistencePort.saveOwner(userModel);
+    }
 
+    @Override
+    public void saveEmployee(UserModel userModel, Long restaurantId) {
+        saveUser(userModel, UserUseCaseConstants.USER_EMPLOYEE, false);
+        userPersistencePort.saveEmployee(userModel, restaurantId);
     }
 
     @Override
     public Boolean isOwner(Long ownerId) {
         UserModel user = userPersistencePort.findUser(ownerId);
-        if(user == null){
+        if (user == null) {
             throw new ResourceNotFoundException(UserUseCaseConstants.USER_NOT_FOUND_MESSAGE);
         }
         return user.getRole().getName().equals(UserUseCaseConstants.USER_OWNER);
     }
-
 }

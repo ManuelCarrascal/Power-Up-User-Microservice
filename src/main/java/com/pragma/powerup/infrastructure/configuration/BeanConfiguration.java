@@ -3,14 +3,12 @@ package com.pragma.powerup.infrastructure.configuration;
 import com.pragma.powerup.domain.api.IAuthServicePort;
 import com.pragma.powerup.domain.api.IRoleServicePort;
 import com.pragma.powerup.domain.api.IUserServicePort;
-import com.pragma.powerup.domain.spi.IAuthPersistencePort;
-import com.pragma.powerup.domain.spi.IEncryptionPersistencePort;
-import com.pragma.powerup.domain.spi.IRolePersistencePort;
-import com.pragma.powerup.domain.spi.IUserPersistencePort;
+import com.pragma.powerup.domain.spi.*;
 import com.pragma.powerup.domain.usecase.AuthUseCase;
 import com.pragma.powerup.domain.usecase.RoleUseCase;
 import com.pragma.powerup.domain.usecase.UserUseCase;
 import com.pragma.powerup.domain.utils.validators.UserValidator;
+import com.pragma.powerup.infrastructure.feign.IRestaurantFeignClient;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.AuthAdapter;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.PasswordEncoderAdapter;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.RoleJpaAdapter;
@@ -29,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @RequiredArgsConstructor
 public class BeanConfiguration {
+
     private final IUserRepository userRepository;
     private final IUserEntityMapper userEntityMapper;
     private final IRoleEntityMapper roleEntityMapper;
@@ -36,10 +35,11 @@ public class BeanConfiguration {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final IRestaurantFeignClient restaurantFeignClient;
 
     @Bean
     public IUserPersistencePort userPersistencePort() {
-        return new UserJpaAdapter(userRepository, userEntityMapper);
+        return new UserJpaAdapter(userRepository, userEntityMapper, restaurantFeignClient);
     }
 
     @Bean
@@ -64,7 +64,12 @@ public class BeanConfiguration {
 
     @Bean
     public IUserServicePort userServicePort() {
-        return new UserUseCase(userPersistencePort(), encryptionPersistencePort(), rolePersistencePort(), userValidator());
+        return new UserUseCase(
+                userPersistencePort(),
+                encryptionPersistencePort(),
+                rolePersistencePort(),
+                userValidator()
+        );
     }
 
     @Bean

@@ -11,6 +11,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Setter
 @Getter
