@@ -12,14 +12,16 @@ import static com.pragma.powerup.domain.utils.constants.UserValidationValues.*;
 
 public class UserValidator {
 
-    public void validate(UserModel userModel) {
+    public void validate(UserModel userModel, boolean validateDateOfBirth) {
         validName(userModel.getName());
         validLastName(userModel.getLastName());
         validDni(userModel.getDni());
         validPhone(userModel.getPhone());
         validEmail(userModel.getEmail());
         validPassword(userModel.getPassword());
-        validAge(userModel.getDateOfBirth());
+        if (validateDateOfBirth) {
+            validAge(userModel.getDateOfBirth());
+        }
     }
 
     private static void validName(String name) {

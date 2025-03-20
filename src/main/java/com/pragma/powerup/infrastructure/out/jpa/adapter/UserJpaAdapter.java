@@ -2,25 +2,32 @@ package com.pragma.powerup.infrastructure.out.jpa.adapter;
 
 import com.pragma.powerup.domain.model.UserModel;
 import com.pragma.powerup.domain.spi.IUserPersistencePort;
+import com.pragma.powerup.infrastructure.exception.CustomException;
+import com.pragma.powerup.infrastructure.feign.IRestaurantFeignClient;
 import com.pragma.powerup.infrastructure.out.jpa.entity.UserEntity;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IUserEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IUserRepository;
+import com.pragma.powerup.infrastructure.util.constants.UserJpaAdapterConstants;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class UserJpaAdapter implements IUserPersistencePort {
 
     private final IUserRepository userRepository;
     private final IUserEntityMapper userEntityMapper;
-
-
-    public UserJpaAdapter(IUserRepository userRepository, IUserEntityMapper userEntityMapper ) {
-        this.userRepository = userRepository;
-        this.userEntityMapper = userEntityMapper;
-    }
+    private final IRestaurantFeignClient restaurantFeignClient;
 
     @Override
     public void saveOwner(UserModel userModel) {
         UserEntity userEntity = userEntityMapper.toEntity(userModel);
         userRepository.save(userEntity);
+    }
+
+    @Override
+    public void saveEmployee(UserModel userModel, Long restaurantId) {
+        UserEntity userEntity = userEntityMapper.toEntity(userModel);
+        UserEntity savedEntity = userRepository.save(userEntity);
+        restaurantFeignClient.createEmployee(savedEntity.getId(), restaurantId);
     }
 
     @Override
@@ -40,6 +47,10 @@ public class UserJpaAdapter implements IUserPersistencePort {
                 .orElse(null);
     }
 
-
-
+    @Override
+    public Long findUserIdByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(UserEntity::getId)
+                .orElseThrow(() -> new CustomException(UserJpaAdapterConstants.USER_NOT_FOUND_BY_EMAIL + email));
+    }
 }

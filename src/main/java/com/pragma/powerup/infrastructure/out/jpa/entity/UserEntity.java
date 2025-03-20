@@ -1,7 +1,7 @@
 package com.pragma.powerup.infrastructure.out.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.pragma.powerup.infrastructure.out.jpa.constants.UserEntityConstants;
+import com.pragma.powerup.infrastructure.util.constants.UserEntityConstants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,8 +45,7 @@ public class UserEntity {
     )
     private String phone;
     @Column(
-            name = UserEntityConstants.COLUMN_DATE_OF_BIRTH,
-            nullable = false
+            name = UserEntityConstants.COLUMN_DATE_OF_BIRTH
     )
     private LocalDate dateOfBirth;
     @Column(

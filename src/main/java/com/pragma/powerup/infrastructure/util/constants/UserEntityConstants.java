@@ -1,4 +1,4 @@
-package com.pragma.powerup.infrastructure.out.jpa.constants;
+package com.pragma.powerup.infrastructure.util.constants;
 
 public class UserEntityConstants {
 

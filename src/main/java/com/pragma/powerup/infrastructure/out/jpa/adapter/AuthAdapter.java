@@ -6,6 +6,7 @@ import com.pragma.powerup.domain.spi.IAuthPersistencePort;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IRoleEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.repository.IUserRepository;
 import com.pragma.powerup.infrastructure.security.jwt.JwtService;
+import com.pragma.powerup.infrastructure.util.constants.AuthAdapterConstants;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -36,20 +37,19 @@ public class AuthAdapter implements IAuthPersistencePort {
                     new UsernamePasswordAuthenticationToken(email, password)
             );
         } catch (Exception e) {
-            throw new AuthenticationException("Authentication failed");
+            throw new AuthenticationException(AuthAdapterConstants.AUTHENTICATION_FAILED_MESSAGE);
         }
 
         return userRepository.findByEmail(email)
                 .map(user -> new UserModel(user.getId(), user.getEmail(), user.getPassword(), roleEntityMapper.toDomain(user.getRole())))
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException(AuthAdapterConstants.USER_NOT_FOUND_MESSAGE));
     }
-
 
 
     @Override
     public String generateToken(UserModel userModel) {
         return jwtService.generateToken(userModel, Map.of(
-                "role", userModel.getRole()
+                AuthAdapterConstants.ROLE_CLAIM_KEY, userModel.getRole()
         ));
     }
 
@@ -60,6 +60,5 @@ public class AuthAdapter implements IAuthPersistencePort {
                 .map(user -> passwordEncoder.matches(password, user.getPassword()))
                 .orElse(false);
     }
-
 
 }
