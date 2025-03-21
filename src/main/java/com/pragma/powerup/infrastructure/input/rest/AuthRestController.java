@@ -4,6 +4,7 @@ import com.pragma.powerup.application.dto.request.AuthRequestDto;
 import com.pragma.powerup.application.dto.response.AuthResponseDto;
 import com.pragma.powerup.application.handler.IAuthHandler;
 import com.pragma.powerup.application.util.constants.openapi.ResponseCodes;
+import com.pragma.powerup.infrastructure.security.service.UserDetailImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,10 +12,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -49,5 +49,10 @@ public class AuthRestController {
     public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody AuthRequestDto authRequestDto) {
         AuthResponseDto response = authHandler.login(authRequestDto);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/authenticated-user")
+    public UserDetailImpl getAuthenticatedUser() {
+        return (UserDetailImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

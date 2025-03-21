@@ -7,6 +7,14 @@ spring:
     username: root
     password: 123456
 
+logging:
+  level:
+    web: trace
+    org:
+      springframework:
+        security: debug
+        web: trace
+
   jpa:
     hibernate:
       ddl-auto: update
