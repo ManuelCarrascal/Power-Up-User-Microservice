@@ -2,247 +2,163 @@ package com.pragma.powerup.domain.usecase;
 
 import com.pragma.powerup.domain.exception.ResourceConflictException;
 import com.pragma.powerup.domain.exception.ResourceNotFoundException;
+import com.pragma.powerup.domain.exception.UnauthorizedActionException;
 import com.pragma.powerup.domain.model.RoleModel;
 import com.pragma.powerup.domain.model.UserModel;
-import com.pragma.powerup.domain.spi.IEncryptionPersistencePort;
-import com.pragma.powerup.domain.spi.IRolePersistencePort;
-import com.pragma.powerup.domain.spi.IUserPersistencePort;
+import com.pragma.powerup.domain.spi.*;
 import com.pragma.powerup.domain.utils.constants.UserUseCaseConstants;
 import com.pragma.powerup.domain.utils.validators.UserValidator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class UserUseCaseTest {
-    @Test
-    void isOwner_ShouldReturnTrue_WhenUserIsOwner() {
-        IUserPersistencePort userPersistencePort = mock(IUserPersistencePort.class);
-        IRolePersistencePort rolePersistencePort = mock(IRolePersistencePort.class);
-        IEncryptionPersistencePort encryptionPersistencePort = mock(IEncryptionPersistencePort.class);
-        UserValidator userValidator = mock(UserValidator.class);
-        UserUseCase userUseCase = new UserUseCase(userPersistencePort, encryptionPersistencePort, rolePersistencePort, userValidator);
+    @Mock
+    private IUserPersistencePort userPersistencePort;
+    @Mock
+    private IEncryptionPersistencePort encryptionPersistencePort;
+    @Mock
+    private IRolePersistencePort rolePersistencePort;
+    @Mock
+    private IRestaurantPersistencePort restaurantPersistencePort;
+    @Mock
+    private IAuthPersistencePort authPersistencePort;
+    @Mock
+    private UserValidator userValidator;
 
-        RoleModel ownerRole = new RoleModel();
-        ownerRole.setName(UserUseCaseConstants.USER_OWNER);
-        UserModel userModel = new UserModel();
-        userModel.setRole(ownerRole);
+    @InjectMocks
+    private UserUseCase userUseCase;
 
-        when(userPersistencePort.findUser(1L)).thenReturn(userModel);
+    private UserModel userModel;
+    private RoleModel ownerRole;
+    private RoleModel employeeRole;
 
-        Boolean result = userUseCase.isOwner(1L);
+    @BeforeEach
+    void setUp() {
+        userModel = new UserModel();
+        userModel.setId(1L);
+        userModel.setEmail("test@example.com");
+        userModel.setDni("12345678");
+        userModel.setPassword("password123");
 
-        assertEquals(true, result);
-        verify(userPersistencePort, times(1)).findUser(1L);
+        ownerRole = new RoleModel(1L, UserUseCaseConstants.USER_OWNER);
+        employeeRole = new RoleModel(2L, UserUseCaseConstants.USER_EMPLOYEE);
     }
 
     @Test
-    void isOwner_ShouldReturnFalse_WhenUserIsNotOwner() {
-        IUserPersistencePort userPersistencePort = mock(IUserPersistencePort.class);
-        IRolePersistencePort rolePersistencePort = mock(IRolePersistencePort.class);
-        IEncryptionPersistencePort encryptionPersistencePort = mock(IEncryptionPersistencePort.class);
-        UserValidator userValidator = mock(UserValidator.class);
-        UserUseCase userUseCase = new UserUseCase(userPersistencePort, encryptionPersistencePort, rolePersistencePort, userValidator);
+    void saveUser_ShouldSaveSuccessfully() {
+        when(userPersistencePort.existsByDni(anyString())).thenReturn(false);
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
+        when(rolePersistencePort.getRoleByName(anyString())).thenReturn(ownerRole);
+        when(encryptionPersistencePort.encodedPassword(anyString())).thenReturn("encodedPassword");
 
-        RoleModel userRole = new RoleModel();
-        userRole.setName("OTHER_ROLE");
-        UserModel userModel = new UserModel();
-        userModel.setRole(userRole);
+        userUseCase.saveUser(userModel, UserUseCaseConstants.USER_OWNER, true);
 
-        when(userPersistencePort.findUser(2L)).thenReturn(userModel);
-
-        Boolean result = userUseCase.isOwner(2L);
-
-        assertEquals(false, result);
-        verify(userPersistencePort, times(1)).findUser(2L);
+        verify(userValidator).validate(userModel, true);
+        verify(encryptionPersistencePort).encodedPassword("password123");
+        assertEquals("encodedPassword", userModel.getPassword());
+        assertEquals(ownerRole, userModel.getRole());
     }
 
     @Test
-    void isOwner_ShouldThrowResourceNotFoundException_WhenUserDoesNotExist() {
-        IUserPersistencePort userPersistencePort = mock(IUserPersistencePort.class);
-        IRolePersistencePort rolePersistencePort = mock(IRolePersistencePort.class);
-        IEncryptionPersistencePort encryptionPersistencePort = mock(IEncryptionPersistencePort.class);
-        UserValidator userValidator = mock(UserValidator.class);
-        UserUseCase userUseCase = new UserUseCase(userPersistencePort, encryptionPersistencePort, rolePersistencePort, userValidator);
+    void saveUser_ShouldThrowException_WhenEmailExists() {
+        when(userPersistencePort.existsByDni(anyString())).thenReturn(false);
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(true);
 
-        when(userPersistencePort.findUser(3L)).thenReturn(null);
-
-        assertThrows(ResourceNotFoundException.class, () -> userUseCase.isOwner(3L));
-        verify(userPersistencePort, times(1)).findUser(3L);
+        assertThrows(ResourceConflictException.class,
+                () -> userUseCase.saveUser(userModel, UserUseCaseConstants.USER_OWNER, true));
     }
 
     @Test
-    void saveOwner_ShouldSaveOwnerSuccessfully_WhenDataIsValid() {
-        IUserPersistencePort userPersistencePort = mock(IUserPersistencePort.class);
-        IEncryptionPersistencePort encryptionPersistencePort = mock(IEncryptionPersistencePort.class);
-        IRolePersistencePort rolePersistencePort = mock(IRolePersistencePort.class);
-        UserValidator userValidator = mock(UserValidator.class);
-        UserUseCase userUseCase = new UserUseCase(userPersistencePort, encryptionPersistencePort, rolePersistencePort, userValidator);
-
-        UserModel userModel = new UserModel.Builder()
-                .name("John")
-                .lastName("Doe")
-                .dni("12345678")
-                .phone("5551234")
-                .dateOfBirth(java.time.LocalDate.of(1990, 1, 1))
-                .email("john.doe@example.com")
-                .password("password123")
-                .build();
-
-        RoleModel ownerRole = new RoleModel();
-        ownerRole.setName(UserUseCaseConstants.USER_OWNER);
-
-        when(userPersistencePort.existsByDni("12345678")).thenReturn(false);
-        when(userPersistencePort.existsByEmail("john.doe@example.com")).thenReturn(false);
+    void saveOwner_ShouldSaveSuccessfully() {
+        when(userPersistencePort.existsByDni(anyString())).thenReturn(false);
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(rolePersistencePort.getRoleByName(UserUseCaseConstants.USER_OWNER)).thenReturn(ownerRole);
-        when(encryptionPersistencePort.encodedPassword("password123")).thenReturn("encryptedPassword123");
+        when(encryptionPersistencePort.encodedPassword(anyString())).thenReturn("encodedPassword");
 
         userUseCase.saveOwner(userModel);
 
-        verify(userValidator, times(1)).validate(userModel);
-        verify(userPersistencePort, times(1)).existsByDni("12345678");
-        verify(userPersistencePort, times(1)).existsByEmail("john.doe@example.com");
-        verify(rolePersistencePort, times(1)).getRoleByName(UserUseCaseConstants.USER_OWNER);
-        verify(encryptionPersistencePort, times(1)).encodedPassword("password123");
-        verify(userPersistencePort, times(1)).saveOwner(userModel);
+        verify(userPersistencePort).saveOwner(userModel);
+        assertEquals("encodedPassword", userModel.getPassword());
     }
 
     @Test
-    void saveOwner_ShouldThrowResourceConflictException_WhenDniAlreadyExists() {
-        IUserPersistencePort userPersistencePort = mock(IUserPersistencePort.class);
-        IEncryptionPersistencePort encryptionPersistencePort = mock(IEncryptionPersistencePort.class);
-        IRolePersistencePort rolePersistencePort = mock(IRolePersistencePort.class);
-        UserValidator userValidator = mock(UserValidator.class);
-        UserUseCase userUseCase = new UserUseCase(userPersistencePort, encryptionPersistencePort, rolePersistencePort, userValidator);
+    void saveEmployee_ShouldSaveSuccessfully() {
+        Long restaurantId = 1L;
+        Long ownerId = 2L;
 
-        UserModel userModel = new UserModel.Builder()
-                .name("John")
-                .lastName("Doe")
-                .dni("12345678")
-                .phone("5551234")
-                .dateOfBirth(java.time.LocalDate.of(1990, 1, 1))
-                .email("john.doe@example.com")
-                .password("password123")
-                .build();
+        when(authPersistencePort.getAuthenticatedUserId()).thenReturn(ownerId);
+        when(restaurantPersistencePort.isOwnerOfRestaurant(ownerId, restaurantId)).thenReturn(true);
+        when(userPersistencePort.existsByDni(anyString())).thenReturn(false);
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
+        when(rolePersistencePort.getRoleByName(UserUseCaseConstants.USER_EMPLOYEE)).thenReturn(employeeRole);
+        when(encryptionPersistencePort.encodedPassword(anyString())).thenReturn("encodedPassword");
 
-        when(userPersistencePort.existsByDni("12345678")).thenReturn(true);
+        userUseCase.saveEmployee(userModel, restaurantId);
 
-        assertThrows(ResourceConflictException.class, () -> userUseCase.saveOwner(userModel));
-        verify(userPersistencePort, times(1)).existsByDni("12345678");
-        verify(userPersistencePort, never()).saveOwner(any());
+        verify(userPersistencePort).saveEmployee(userModel, restaurantId);
+        verify(restaurantPersistencePort).createEmployee(userModel.getId(), restaurantId);
     }
 
     @Test
-    void saveOwner_ShouldThrowResourceConflictException_WhenEmailAlreadyExists() {
-        IUserPersistencePort userPersistencePort = mock(IUserPersistencePort.class);
-        IEncryptionPersistencePort encryptionPersistencePort = mock(IEncryptionPersistencePort.class);
-        IRolePersistencePort rolePersistencePort = mock(IRolePersistencePort.class);
-        UserValidator userValidator = mock(UserValidator.class);
-        UserUseCase userUseCase = new UserUseCase(userPersistencePort, encryptionPersistencePort, rolePersistencePort, userValidator);
+    void isOwner_ShouldReturnTrue() {
+        Long userId = 1L;
+        userModel.setRole(ownerRole);
 
-        UserModel userModel = new UserModel.Builder()
-                .name("John")
-                .lastName("Doe")
-                .dni("12345678")
-                .phone("5551234")
-                .dateOfBirth(java.time.LocalDate.of(1990, 1, 1))
-                .email("john.doe@example.com")
-                .password("password123")
-                .build();
+        when(userPersistencePort.findUser(userId)).thenReturn(userModel);
 
-        when(userPersistencePort.existsByDni("12345678")).thenReturn(false);
-        when(userPersistencePort.existsByEmail("john.doe@example.com")).thenReturn(true);
-
-        assertThrows(ResourceConflictException.class, () -> userUseCase.saveOwner(userModel));
-        verify(userPersistencePort, times(1)).existsByDni("12345678");
-        verify(userPersistencePort, times(1)).existsByEmail("john.doe@example.com");
-        verify(userPersistencePort, never()).saveOwner(any());
+        assertTrue(userUseCase.isOwner(userId));
     }
 
     @Test
-    void saveUser_ShouldSaveUserSuccessfully_WhenDataIsValid() {
-        IUserPersistencePort userPersistencePort = mock(IUserPersistencePort.class);
-        IEncryptionPersistencePort encryptionPersistencePort = mock(IEncryptionPersistencePort.class);
-        IRolePersistencePort rolePersistencePort = mock(IRolePersistencePort.class);
-        UserValidator userValidator = mock(UserValidator.class);
-        UserUseCase userUseCase = new UserUseCase(userPersistencePort, encryptionPersistencePort, rolePersistencePort, userValidator);
+    void isOwner_ShouldReturnFalse() {
+        Long userId = 1L;
+        userModel.setRole(employeeRole);
 
-        UserModel userModel = new UserModel.Builder()
-                .name("Alice")
-                .lastName("Smith")
-                .dni("98765432")
-                .phone("5555678")
-                .dateOfBirth(java.time.LocalDate.of(1992, 5, 15))
-                .email("alice.smith@example.com")
-                .password("securePass123")
-                .build();
+        when(userPersistencePort.findUser(userId)).thenReturn(userModel);
 
-        RoleModel userRole = new RoleModel();
-        userRole.setName("USER_ROLE");
-
-        when(userPersistencePort.existsByDni("98765432")).thenReturn(false);
-        when(userPersistencePort.existsByEmail("alice.smith@example.com")).thenReturn(false);
-        when(rolePersistencePort.getRoleByName("USER_ROLE")).thenReturn(userRole);
-        when(encryptionPersistencePort.encodedPassword("securePass123")).thenReturn("encodedSecurePass123");
-
-        userUseCase.saveUser(userModel, "USER_ROLE");
-
-        verify(userValidator, times(1)).validate(userModel);
-        verify(userPersistencePort, times(1)).existsByDni("98765432");
-        verify(userPersistencePort, times(1)).existsByEmail("alice.smith@example.com");
-        verify(rolePersistencePort, times(1)).getRoleByName("USER_ROLE");
-        verify(encryptionPersistencePort, times(1)).encodedPassword("securePass123");
+        assertFalse(userUseCase.isOwner(userId));
     }
 
     @Test
-    void saveUser_ShouldThrowResourceConflictException_WhenDniAlreadyExists() {
-        IUserPersistencePort userPersistencePort = mock(IUserPersistencePort.class);
-        IEncryptionPersistencePort encryptionPersistencePort = mock(IEncryptionPersistencePort.class);
-        IRolePersistencePort rolePersistencePort = mock(IRolePersistencePort.class);
-        UserValidator userValidator = mock(UserValidator.class);
-        UserUseCase userUseCase = new UserUseCase(userPersistencePort, encryptionPersistencePort, rolePersistencePort, userValidator);
+    void isOwner_ShouldThrowException_WhenUserNotFound() {
+        Long userId = 1L;
+        when(userPersistencePort.findUser(userId)).thenReturn(null);
 
-        UserModel userModel = new UserModel.Builder()
-                .name("Alice")
-                .lastName("Smith")
-                .dni("98765432")
-                .phone("5555678")
-                .dateOfBirth(java.time.LocalDate.of(1992, 5, 15))
-                .email("alice.smith@example.com")
-                .password("securePass123")
-                .build();
-
-        when(userPersistencePort.existsByDni("98765432")).thenReturn(true);
-
-        assertThrows(ResourceConflictException.class, () -> userUseCase.saveUser(userModel, "USER_ROLE"));
-        verify(userPersistencePort, times(1)).existsByDni("98765432");
-        verify(userPersistencePort, never()).existsByEmail(any());
+        assertThrows(ResourceNotFoundException.class, () -> userUseCase.isOwner(userId));
     }
 
     @Test
-    void saveUser_ShouldThrowResourceConflictException_WhenEmailAlreadyExists() {
-        IUserPersistencePort userPersistencePort = mock(IUserPersistencePort.class);
-        IEncryptionPersistencePort encryptionPersistencePort = mock(IEncryptionPersistencePort.class);
-        IRolePersistencePort rolePersistencePort = mock(IRolePersistencePort.class);
-        UserValidator userValidator = mock(UserValidator.class);
-        UserUseCase userUseCase = new UserUseCase(userPersistencePort, encryptionPersistencePort, rolePersistencePort, userValidator);
+    void saveEmployee_ShouldThrowException_WhenUnauthorized() {
+        Long restaurantId = 1L;
+        Long ownerId = 2L;
 
-        UserModel userModel = new UserModel.Builder()
-                .name("Alice")
-                .lastName("Smith")
-                .dni("98765432")
-                .phone("5555678")
-                .dateOfBirth(java.time.LocalDate.of(1992, 5, 15))
-                .email("alice.smith@example.com")
-                .password("securePass123")
-                .build();
+        when(authPersistencePort.getAuthenticatedUserId()).thenReturn(ownerId);
+        when(restaurantPersistencePort.isOwnerOfRestaurant(ownerId, restaurantId)).thenReturn(false);
 
-        when(userPersistencePort.existsByDni("98765432")).thenReturn(false);
-        when(userPersistencePort.existsByEmail("alice.smith@example.com")).thenReturn(true);
+        assertThrows(UnauthorizedActionException.class,
+                () -> userUseCase.saveEmployee(userModel, restaurantId));
 
-        assertThrows(ResourceConflictException.class, () -> userUseCase.saveUser(userModel, "USER_ROLE"));
-        verify(userPersistencePort, times(1)).existsByDni("98765432");
-        verify(userPersistencePort, times(1)).existsByEmail("alice.smith@example.com");
+        verifyNoInteractions(userPersistencePort);
+        verifyNoInteractions(encryptionPersistencePort);
+        verifyNoInteractions(rolePersistencePort);
+    }
+
+    @Test
+    void saveUser_ShouldThrowException_WhenDniExists() {
+        when(userPersistencePort.existsByDni(anyString())).thenReturn(true);
+
+        assertThrows(ResourceConflictException.class,
+                () -> userUseCase.saveUser(userModel, UserUseCaseConstants.USER_OWNER, true));
+
+        verifyNoInteractions(encryptionPersistencePort);
+        verifyNoInteractions(rolePersistencePort);
     }
 }
