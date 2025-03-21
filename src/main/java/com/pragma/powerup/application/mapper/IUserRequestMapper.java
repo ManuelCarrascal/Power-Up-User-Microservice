@@ -1,5 +1,6 @@
 package com.pragma.powerup.application.mapper;
 
+import com.pragma.powerup.application.dto.request.ClientRequestDto;
 import com.pragma.powerup.application.dto.request.EmployeeRequestDto;
 import com.pragma.powerup.application.dto.request.UserRequestDto;
 import com.pragma.powerup.domain.model.UserModel;
@@ -16,4 +17,7 @@ public interface IUserRequestMapper {
 
     @Mapping(target = "id", ignore = true)
     UserModel toEmployee (EmployeeRequestDto employeeRequestDto);
+
+    @Mapping(target = "id", ignore = true)
+    UserModel toClient (ClientRequestDto clientRequestDto);
 }
