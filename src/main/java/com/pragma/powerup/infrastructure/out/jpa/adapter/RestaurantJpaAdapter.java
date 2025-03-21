@@ -1,7 +1,7 @@
 package com.pragma.powerup.infrastructure.out.jpa.adapter;
 
 import com.pragma.powerup.domain.spi.IRestaurantPersistencePort;
-import com.pragma.powerup.infrastructure.feign.IRestaurantFeignClient;
+import com.pragma.powerup.infrastructure.out.feign.IRestaurantFeignClient;
 
 public class RestaurantJpaAdapter implements IRestaurantPersistencePort {
 

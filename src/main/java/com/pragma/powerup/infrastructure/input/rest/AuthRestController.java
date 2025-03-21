@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -52,6 +51,25 @@ public class AuthRestController {
     }
 
     @GetMapping("/authenticated-user")
+    @Operation(
+            summary = GET_USER_OPERATION_SUMMARY,
+            description = GET_USER_OPERATION_DESCRIPTION
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = ResponseCodes.OK,
+                    description = RESPONSE_USER_RETRIEVED,
+                    content = @Content(
+                            mediaType = APPLICATION_JSON,
+                            schema = @Schema(implementation = UserDetailImpl.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = ResponseCodes.UNAUTHORIZED,
+                    description = RESPONSE_401_DESCRIPTION,
+                    content = @Content(mediaType = APPLICATION_JSON)
+            )
+    })
     public UserDetailImpl getAuthenticatedUser() {
         return (UserDetailImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }

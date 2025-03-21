@@ -1,5 +1,6 @@
-package com.pragma.powerup.infrastructure.feign;
+package com.pragma.powerup.infrastructure.out.feign;
 
+import com.pragma.powerup.infrastructure.feign.FeignConfig;
 import com.pragma.powerup.infrastructure.util.constants.IRestaurantFeignClientConstants;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
