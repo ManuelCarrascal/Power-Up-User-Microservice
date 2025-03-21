@@ -62,6 +62,12 @@ public class UserUseCase implements IUserServicePort {
     }
 
     @Override
+    public void saveClient(UserModel userModel) {
+        saveUser(userModel, UserUseCaseConstants.USER_CLIENT, false);
+        userPersistencePort.saveClient(userModel);
+    }
+
+    @Override
     public Boolean isOwner(Long ownerId) {
         UserModel user = userPersistencePort.findUser(ownerId);
         if (user == null) {

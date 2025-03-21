@@ -29,6 +29,12 @@ public class UserJpaAdapter implements IUserPersistencePort {
     }
 
     @Override
+    public void saveClient(UserModel userModel) {
+        UserEntity userEntity = userEntityMapper.toEntity(userModel);
+        userRepository.save(userEntity);
+    }
+
+    @Override
     public boolean existsByDni(String dni) {
         return userRepository.existsByDni(dni);
     }
