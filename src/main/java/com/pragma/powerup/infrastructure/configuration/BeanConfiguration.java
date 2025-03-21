@@ -8,7 +8,7 @@ import com.pragma.powerup.domain.usecase.AuthUseCase;
 import com.pragma.powerup.domain.usecase.RoleUseCase;
 import com.pragma.powerup.domain.usecase.UserUseCase;
 import com.pragma.powerup.domain.utils.validators.UserValidator;
-import com.pragma.powerup.infrastructure.feign.IRestaurantFeignClient;
+import com.pragma.powerup.infrastructure.out.feign.IRestaurantFeignClient;
 import com.pragma.powerup.infrastructure.out.jpa.adapter.*;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IRoleEntityMapper;
 import com.pragma.powerup.infrastructure.out.jpa.mapper.IUserEntityMapper;

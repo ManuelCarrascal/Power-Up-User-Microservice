@@ -24,7 +24,6 @@ import javax.validation.Valid;
 public class UserRestController {
 
     private final IUserHandler userHandler;
-
     @PostMapping("/owner")
     @PreAuthorize(UserRestControllerConstants.PREAUTHORIZE_ROLE_ADMIN)
     @Operation(
@@ -40,6 +39,7 @@ public class UserRestController {
     }
 
     @PostMapping("/employee")
+    @PreAuthorize("hasAuthority('ROLE_OWNER')")
     @Operation(
             summary = OpenApiUserRestControllerConstants.CREATE_EMPLOYEE_OPERATION_SUMMARY,
             description = OpenApiUserRestControllerConstants.CREATE_EMPLOYEE_OPERATION_DESCRIPTION
