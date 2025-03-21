@@ -161,4 +161,46 @@ class UserUseCaseTest {
         verifyNoInteractions(encryptionPersistencePort);
         verifyNoInteractions(rolePersistencePort);
     }
+
+    @Test
+    void saveClient_ShouldSaveSuccessfully() {
+        RoleModel clientRole = new RoleModel(4L, UserUseCaseConstants.USER_CLIENT);
+
+        when(userPersistencePort.existsByDni(anyString())).thenReturn(false);
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
+        when(rolePersistencePort.getRoleByName(UserUseCaseConstants.USER_CLIENT)).thenReturn(clientRole);
+        when(encryptionPersistencePort.encodedPassword(anyString())).thenReturn("encodedPassword");
+
+        userUseCase.saveClient(userModel);
+
+        verify(userValidator).validate(userModel, false);
+        verify(userPersistencePort).saveClient(userModel);
+        assertEquals("encodedPassword", userModel.getPassword());
+        assertEquals(clientRole, userModel.getRole());
+    }
+
+    @Test
+    void saveClient_ShouldThrowException_WhenEmailExists() {
+        when(userPersistencePort.existsByDni(anyString())).thenReturn(false);
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(true);
+
+        assertThrows(ResourceConflictException.class,
+                () -> userUseCase.saveClient(userModel));
+
+        verify(userValidator).validate(userModel, false);
+        verifyNoInteractions(encryptionPersistencePort);
+        verify(userPersistencePort, never()).saveClient(any());
+    }
+
+    @Test
+    void saveClient_ShouldThrowException_WhenDniExists() {
+        when(userPersistencePort.existsByDni(anyString())).thenReturn(true);
+
+        assertThrows(ResourceConflictException.class,
+                () -> userUseCase.saveClient(userModel));
+
+        verify(userValidator).validate(userModel, false);
+        verifyNoInteractions(encryptionPersistencePort);
+        verify(userPersistencePort, never()).saveClient(any());
+    }
 }
