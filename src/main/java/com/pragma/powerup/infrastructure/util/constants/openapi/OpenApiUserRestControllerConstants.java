@@ -21,4 +21,8 @@ public class OpenApiUserRestControllerConstants {
     public static final String VERIFY_OWNER_OPERATION_SUMMARY = "Verify if a user is an Owner";
     public static final String VERIFY_OWNER_OPERATION_DESCRIPTION = "Endpoint to check if the user with the specified ID has the Owner role.";
     public static final String RESPONSE_OWNER_VERIFIED_DESCRIPTION = "Successful verification. Returns true if the user is an Owner, false otherwise.";
+
+    public static final String CREATE_CLIENT_OPERATION_SUMMARY = "Create a new client";
+    public static final String CREATE_CLIENT_OPERATION_DESCRIPTION = "Creates a new client user in the system";
+    public static final String RESPONSE_CLIENT_CREATED_DESCRIPTION = "Client created successfully";
 }

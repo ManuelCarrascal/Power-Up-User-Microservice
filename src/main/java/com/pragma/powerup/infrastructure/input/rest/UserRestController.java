@@ -56,6 +56,13 @@ public class UserRestController {
     }
 
     @PostMapping("/client")
+    @Operation(
+            summary = OpenApiUserRestControllerConstants.CREATE_CLIENT_OPERATION_SUMMARY,
+            description = OpenApiUserRestControllerConstants.CREATE_CLIENT_OPERATION_DESCRIPTION
+    )
+    @ApiResponse(responseCode = ResponseCodes.CREATED, description = OpenApiUserRestControllerConstants.RESPONSE_CLIENT_CREATED_DESCRIPTION)
+    @ApiResponse(responseCode = ResponseCodes.BAD_REQUEST, description = OpenApiUserRestControllerConstants.RESPONSE_BAD_REQUEST)
+    @ApiResponse(responseCode = ResponseCodes.CONFLICT, description = OpenApiUserRestControllerConstants.RESPONSE_CONFLICT)
     public ResponseEntity<Void> createClient(@Valid @RequestBody ClientRequestDto clientRequestDto) {
         userHandler.saveClient(clientRequestDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
