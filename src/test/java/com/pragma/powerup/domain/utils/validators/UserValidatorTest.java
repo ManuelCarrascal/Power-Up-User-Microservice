@@ -23,7 +23,7 @@ import java.time.LocalDate;
 
         UserValidator validator = new UserValidator();
 
-        InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel));
+        InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel,true));
         Assertions.assertEquals("name is mandatory", exception.getMessage());
     }
 
@@ -35,7 +35,7 @@ import java.time.LocalDate;
                  .name("")
                  .build();
 
-         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel));
+         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel,true));
          Assertions.assertEquals("name is mandatory", exception.getMessage());
      }
 
@@ -53,7 +53,7 @@ import java.time.LocalDate;
 
          UserValidator validator = new UserValidator();
 
-         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel));
+         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel,true));
          Assertions.assertEquals("last name is mandatory", exception.getMessage());
     }
 
@@ -65,7 +65,7 @@ import java.time.LocalDate;
 
          UserValidator validator = new UserValidator();
 
-         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel));
+         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel,true));
          Assertions.assertEquals("last name is mandatory", exception.getMessage());
      }
 
@@ -83,7 +83,7 @@ import java.time.LocalDate;
 
          UserValidator validator = new UserValidator();
 
-         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel));
+         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel,true));
          Assertions.assertEquals("dni is invalid", exception.getMessage());
     }
 
@@ -101,7 +101,7 @@ import java.time.LocalDate;
 
          UserValidator validator = new UserValidator();
 
-         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel));
+         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel,true));
          Assertions.assertEquals("dni is mandatory", exception.getMessage());
      }
 
@@ -119,7 +119,7 @@ import java.time.LocalDate;
 
          UserValidator validator = new UserValidator();
 
-         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel));
+         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel,true));
          Assertions.assertEquals("phone is invalid", exception.getMessage());
     }
 
@@ -137,7 +137,7 @@ import java.time.LocalDate;
 
          UserValidator validator = new UserValidator();
 
-         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel));
+         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel,true));
          Assertions.assertEquals("phone is mandatory", exception.getMessage());
      }
 
@@ -151,7 +151,7 @@ import java.time.LocalDate;
 
          UserValidator validator = new UserValidator();
 
-         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel));
+         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel,true));
          Assertions.assertEquals("phone is invalid", exception.getMessage());
      }
 
@@ -169,7 +169,7 @@ import java.time.LocalDate;
 
          UserValidator validator = new UserValidator();
 
-         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel));
+         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel,true));
          Assertions.assertEquals("invalid email format", exception.getMessage());
     }
 
@@ -187,7 +187,7 @@ import java.time.LocalDate;
 
         UserValidator validator = new UserValidator();
 
-        InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel));
+        InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel,true));
         Assertions.assertEquals("email is mandatory", exception.getMessage());
     }
 
@@ -205,7 +205,7 @@ import java.time.LocalDate;
 
          UserValidator validator = new UserValidator();
 
-         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel));
+         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel,true));
          Assertions.assertEquals("password is mandatory", exception.getMessage());
     }
 
@@ -224,7 +224,7 @@ import java.time.LocalDate;
             .build();
 
         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class,
-            () -> validator.validate(userModel)
+            () -> validator.validate(userModel, true)
         );
         Assertions.assertEquals("password is mandatory", exception.getMessage());
     }
@@ -243,7 +243,7 @@ import java.time.LocalDate;
 
          UserValidator validator = new UserValidator();
 
-         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel));
+         InvalidDataException exception = Assertions.assertThrows(InvalidDataException.class, () -> validator.validate(userModel,true));
          Assertions.assertEquals("date of birth is mandatory", exception.getMessage());
     }
 
@@ -262,6 +262,6 @@ import java.time.LocalDate;
 
         UserValidator validator = new UserValidator();
 
-        Assertions.assertDoesNotThrow(() -> validator.validate(userModel));
+        Assertions.assertDoesNotThrow(() -> validator.validate(userModel,true));
     }
 }

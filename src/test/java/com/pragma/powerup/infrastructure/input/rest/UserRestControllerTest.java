@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.time.LocalDate;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class UserRestControllerTest {
@@ -50,19 +51,19 @@ class UserRestControllerTest {
 
         doNothing().when(userHandler).saveOwner(any(UserRequestDto.class));
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/user")
+        mockMvc.perform(post("/api/v1/user/owner")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRequestDto)))
                 .andExpect(status().isCreated());
 
-        verify(userHandler, times(1)).saveOwner(any(UserRequestDto.class));
+        verify(userHandler).saveOwner(any(UserRequestDto.class));
     }
 
     @Test
     void createOwner_InvalidRequest_ShouldReturnBadRequest() throws Exception {
         UserRequestDto userRequestDto = new UserRequestDto();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/user")
+        mockMvc.perform(post("/api/v1/user/owner")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRequestDto)))
                 .andExpect(status().isBadRequest());
