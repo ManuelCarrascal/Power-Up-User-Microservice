@@ -8,6 +8,8 @@ public interface IUserPersistencePort {
 
     void saveEmployee(UserModel userModel, Long restaurantId);
 
+    void saveClient(UserModel userModel);
+
     boolean existsByDni(String dni);
 
     boolean existsByEmail(String email);

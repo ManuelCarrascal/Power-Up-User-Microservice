@@ -1,5 +1,6 @@
 package com.pragma.powerup.infrastructure.input.rest;
 
+import com.pragma.powerup.application.dto.request.ClientRequestDto;
 import com.pragma.powerup.application.dto.request.EmployeeRequestDto;
 import com.pragma.powerup.application.dto.request.UserRequestDto;
 import com.pragma.powerup.application.handler.IUserHandler;
@@ -51,6 +52,12 @@ public class UserRestController {
             @Valid @RequestBody EmployeeRequestDto employeeRequestDto,
             @RequestParam Long restaurantId) {
         userHandler.saveEmployee(employeeRequestDto, restaurantId);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/client")
+    public ResponseEntity<Void> createClient(@Valid @RequestBody ClientRequestDto clientRequestDto) {
+        userHandler.saveClient(clientRequestDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
