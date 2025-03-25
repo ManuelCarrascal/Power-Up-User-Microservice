@@ -9,5 +9,6 @@ public interface IUserHandler {
     void saveEmployee(EmployeeRequestDto employeeRequestDto, Long restaurantId);
     void saveClient(ClientRequestDto clientRequestDto);
     Boolean isOwner(Long ownerId);
+    String getPhoneNumberById(Long userId);
 
 }

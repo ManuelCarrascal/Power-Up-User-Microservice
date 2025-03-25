@@ -79,4 +79,15 @@ public class UserRestController {
         return ResponseEntity.ok(userHandler.isOwner(ownerId));
     }
 
+    @GetMapping("/phone")
+    @Operation(
+            summary = OpenApiUserRestControllerConstants.GET_PHONE_OPERATION_SUMMARY,
+            description = OpenApiUserRestControllerConstants.GET_PHONE_OPERATION_DESCRIPTION
+    )
+    @ApiResponse(responseCode = ResponseCodes.OK, description = OpenApiUserRestControllerConstants.RESPONSE_PHONE_RETRIEVED_DESCRIPTION)
+    @ApiResponse(responseCode = ResponseCodes.NOT_FOUND, description = OpenApiUserRestControllerConstants.RESPONSE_USER_NOT_FOUND)
+    @ApiResponse(responseCode = ResponseCodes.BAD_REQUEST, description = OpenApiUserRestControllerConstants.RESPONSE_BAD_REQUEST)
+    public ResponseEntity<String> getPhoneNumberById(@RequestParam("userId") Long userId) {
+        return ResponseEntity.ok(userHandler.getPhoneNumberById(userId));
+    }
 }

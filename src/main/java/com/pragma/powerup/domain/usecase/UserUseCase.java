@@ -75,4 +75,13 @@ public class UserUseCase implements IUserServicePort {
         }
         return user.getRole().getName().equals(UserUseCaseConstants.USER_OWNER);
     }
+
+    @Override
+    public String getPhoneNumberById(Long userId) {
+        UserModel user = userPersistencePort.findUser(userId);
+        if (user == null) {
+            throw new ResourceNotFoundException(UserUseCaseConstants.USER_NOT_FOUND_MESSAGE);
+        }
+        return user.getPhone();
+    }
 }

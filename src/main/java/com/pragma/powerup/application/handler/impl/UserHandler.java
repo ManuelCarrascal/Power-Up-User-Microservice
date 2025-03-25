@@ -41,4 +41,9 @@ public class UserHandler implements IUserHandler {
         return userServicePort.isOwner(ownerId);
     }
 
+    @Override
+    public String getPhoneNumberById(Long userId) {
+        return userServicePort.getPhoneNumberById(userId);
+    }
+
 }

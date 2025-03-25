@@ -7,4 +7,5 @@ public interface IUserServicePort {
     void saveEmployee(UserModel userModel, Long restaurantId);
     void saveClient(UserModel userModel);
     Boolean isOwner(Long ownerId);
+    String getPhoneNumberById(Long userId);
 }

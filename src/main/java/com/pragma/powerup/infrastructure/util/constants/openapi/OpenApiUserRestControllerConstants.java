@@ -25,4 +25,10 @@ public class OpenApiUserRestControllerConstants {
     public static final String CREATE_CLIENT_OPERATION_SUMMARY = "Create a new client";
     public static final String CREATE_CLIENT_OPERATION_DESCRIPTION = "Creates a new client user in the system";
     public static final String RESPONSE_CLIENT_CREATED_DESCRIPTION = "Client created successfully";
+
+    // Constants for the phone endpoint
+    public static final String GET_PHONE_OPERATION_SUMMARY = "Get user phone number";
+    public static final String GET_PHONE_OPERATION_DESCRIPTION = "Retrieves the phone number of a user by their ID";
+    public static final String RESPONSE_PHONE_RETRIEVED_DESCRIPTION = "Successfully retrieved the user's phone number";
+    public static final String RESPONSE_USER_NOT_FOUND = "User with the given ID was not found";
 }
